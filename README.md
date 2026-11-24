@@ -1,2 +1,1 @@
-# test-room-d
-room init test
+# init の確かめ用

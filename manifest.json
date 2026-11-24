@@ -1,0 +1,17 @@
+{
+  "format": 1,
+  "modules": [
+    {
+      "name": "entry",
+      "path": "modules/entry.js",
+      "sha256": "78f092f5a40d7784c711fc287dffe0b411e81e4491ab3cff299ddd51fa9597b8",
+      "bytes": 137,
+      "issue": null,
+      "author": {
+        "login": "clubroomjp",
+        "id": 124767248
+      },
+      "adoptedAt": "2026-11-24T23:57:02.005Z"
+    }
+  ]
+}

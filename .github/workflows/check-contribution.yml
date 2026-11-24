@@ -1,0 +1,72 @@
+# 提出を検査するワークフロー。部屋のリポジトリの .github/workflows/ に置く。
+#
+# - run: の中には式を書かない。値は環境変数で渡す。
+# - イシューの題名と本文は、どこにも展開しない。読むのは検査役の中だけ。
+# - 使う Action は、コミットの SHA で固定する。
+# - 権限を持つジョブでは、訪問者のコードを動かさない。
+# - 訪問者のコードを動かすジョブでは、キャッシュに書き込まない。
+# - 実行環境は ubuntu-24.04 と Node 24 に固定する。
+name: check-contribution
+on:
+  issues:
+    types: [opened, edited]
+permissions: {}
+concurrency:
+  group: check-contribution-${{ github.event.issue.number }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions: {}
+    outputs:
+      code: ${{ steps.emit.outputs.code }}
+      name: ${{ steps.emit.outputs.name }}
+      sha256: ${{ steps.emit.outputs.sha256 }}
+    steps:
+      - name: 部屋のまとめと検査役を取り出す
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            /bundle.json
+            /tools/check/
+          sparse-checkout-cone-mode: false
+      - name: Node 24 を用意する
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: 提出を検査する
+        run: node tools/check/check.mjs "$GITHUB_EVENT_PATH" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/result.json"
+      - name: 結果をジョブの出力にする
+        id: emit
+        run: node tools/check/emit.mjs "$RUNNER_TEMP/result.json" >> "$GITHUB_OUTPUT"
+  report:
+    needs: check
+    if: ${{ !cancelled() && needs.check.outputs.code != '' && needs.check.outputs.code != 'skip' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions:
+      issues: write
+    steps:
+      - name: 結果を書く道具だけを取り出す
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            /tools/check/report.mjs
+          sparse-checkout-cone-mode: false
+      - name: Node 24 を用意する
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: ラベルとコメントを更新する
+        run: node tools/check/report.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          CODE: ${{ needs.check.outputs.code }}
+          NAME: ${{ needs.check.outputs.name }}
+          SHA256: ${{ needs.check.outputs.sha256 }}
