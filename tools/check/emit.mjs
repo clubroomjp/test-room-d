@@ -1,7 +1,7 @@
-// src/emit-main.ts
+// packages/check/src/emit-main.ts
 import { readFile, stat } from "node:fs/promises";
-// ../protocol/src/limits.ts
-var NAME_PATTERN = /^[a-z][a-z0-9-]{0,39}$/;
+// packages/protocol/src/limits.ts
+var NAME_PATTERN = /^(?!(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$)[a-z][a-z0-9-]{0,39}$/;
 var SHA256_PATTERN = /^[0-9a-f]{64}$/;
 var FLOORS = {
   codeChars: 48000,
@@ -16,10 +16,10 @@ var LIMIT_RANGES = {
   canvasWidth: { min: 16, max: FLOORS.canvasSize },
   canvasHeight: { min: 16, max: FLOORS.canvasSize }
 };
-// ../protocol/src/digest.ts
+// packages/protocol/src/digest.ts
 var encoder = new TextEncoder;
 var utf8Bytes = (text) => encoder.encode(text).length;
-// ../protocol/src/marker.ts
+// packages/protocol/src/marker.ts
 var CHECK_CODES = [
   "ok",
   "ok-static",
@@ -38,13 +38,13 @@ var CHECK_CODES = [
   "internal"
 ];
 var isCheckCode = (value) => typeof value === "string" && CHECK_CODES.includes(value);
-// ../protocol/src/reveal.ts
+// packages/protocol/src/reveal.ts
 var BLANK_LOOKING = new Set(["⠀", "\uD81B\uDFE4", "\uD834\uDD59"]);
-// ../protocol/src/text.ts
+// packages/protocol/src/text.ts
 var ALNUM = "0-9A-Za-z\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A";
 var CODE_CHAR = "[0-9A-Z\\uFF10-\\uFF19\\uFF21-\\uFF3A]";
 var AUTH_CODE = new RegExp(`(?<![${ALNUM}])${CODE_CHAR}{4}\\s{0,3}[-\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]\\s{0,3}` + `${CODE_CHAR}{4}(?![${ALNUM}])`, "gu");
-// src/result.ts
+// packages/check/src/result.ts
 var RESULT_KEYS = ["code", "name", "digest"];
 var isRecord2 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var parseResult = (json) => {
@@ -68,7 +68,7 @@ var parseResult = (json) => {
   return { code, name, digest };
 };
 
-// src/emit.ts
+// packages/check/src/emit.ts
 var RESULT_BYTES_MAX = 64 * 1024;
 var INTERNAL_LINES = `code=internal
 name=
@@ -97,7 +97,7 @@ var emitLines = (text) => {
   return toLines(result.code, result.name, result.digest);
 };
 
-// src/emit-main.ts
+// packages/check/src/emit-main.ts
 var decoder = new TextDecoder("utf-8", { fatal: true });
 var readResultText = async (path) => {
   if (path === undefined)

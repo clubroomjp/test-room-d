@@ -12,7 +12,7 @@ var __export = (target, all) => {
 var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 var __require = /* @__PURE__ */ createRequire(import.meta.url);
 
-// ../../node_modules/.bun/@jitl+quickjs-ffi-types@0.32.0/node_modules/@jitl/quickjs-ffi-types/dist/index.mjs
+// node_modules/.bun/@jitl+quickjs-ffi-types@0.32.0/node_modules/@jitl/quickjs-ffi-types/dist/index.mjs
 var EvalFlags, IntrinsicsFlags, JSPromiseStateEnum, GetOwnPropertyNamesFlags, IsEqualOp;
 var init_dist = __esm(() => {
   EvalFlags = { JS_EVAL_TYPE_GLOBAL: 0, JS_EVAL_TYPE_MODULE: 1, JS_EVAL_TYPE_DIRECT: 2, JS_EVAL_TYPE_INDIRECT: 3, JS_EVAL_TYPE_MASK: 3, JS_EVAL_FLAG_STRICT: 8, JS_EVAL_FLAG_STRIP: 16, JS_EVAL_FLAG_COMPILE_ONLY: 32, JS_EVAL_FLAG_BACKTRACE_BARRIER: 64 };
@@ -22,7 +22,7 @@ var init_dist = __esm(() => {
   IsEqualOp = { IsStrictlyEqual: 0, IsSameValue: 1, IsSameValueZero: 2 };
 });
 
-// ../../node_modules/.bun/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/chunk-V2S4ZYJR.mjs
+// node_modules/.bun/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/chunk-V2S4ZYJR.mjs
 function debugLog(...args) {
   QTS_DEBUG && console.log("quickjs-emscripten:", ...args);
 }
@@ -1208,7 +1208,7 @@ ${cause.stack}Host: ${hostStack}`), Object.assign(exception, rest), exception;
   };
 });
 
-// ../../node_modules/.bun/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/module-ES6BEMUI.mjs
+// node_modules/.bun/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/module-ES6BEMUI.mjs
 var exports_module_ES6BEMUI = {};
 __export(exports_module_ES6BEMUI, {
   applyModuleEvalRuntimeOptions: () => applyModuleEvalRuntimeOptions,
@@ -1220,7 +1220,7 @@ var init_module_ES6BEMUI = __esm(() => {
   init_chunk_V2S4ZYJR();
 });
 
-// ../../node_modules/.bun/@jitl+quickjs-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-wasmfile-release-sync/dist/ffi.mjs
+// node_modules/.bun/@jitl+quickjs-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-wasmfile-release-sync/dist/ffi.mjs
 var exports_ffi = {};
 __export(exports_ffi, {
   QuickJSFFI: () => QuickJSFFI
@@ -1301,7 +1301,7 @@ var QuickJSFFI = class {
 };
 var init_ffi = () => {};
 
-// ../../node_modules/.bun/@jitl+quickjs-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-wasmfile-release-sync/dist/emscripten-module.mjs
+// node_modules/.bun/@jitl+quickjs-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-wasmfile-release-sync/dist/emscripten-module.mjs
 var exports_emscripten_module = {};
 __export(exports_emscripten_module, {
   default: () => emscripten_module_default
@@ -1809,12 +1809,12 @@ var init_emscripten_module = __esm(() => {
   emscripten_module_default = QuickJSRaw;
 });
 
-// src/sandbox/worker.ts
+// packages/check/src/sandbox/worker.ts
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { parentPort, workerData } from "node:worker_threads";
 
-// ../../node_modules/.bun/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/index.mjs
+// node_modules/.bun/quickjs-emscripten-core@0.32.0/node_modules/quickjs-emscripten-core/dist/index.mjs
 init_chunk_V2S4ZYJR();
 init_dist();
 async function newQuickJSWASMModuleFromVariant(variantOrPromise) {
@@ -1882,10 +1882,10 @@ function newMockExtensions(log) {
   } };
 }
 
-// ../../node_modules/.bun/@jitl+quickjs-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-wasmfile-release-sync/dist/index.mjs
+// node_modules/.bun/@jitl+quickjs-wasmfile-release-sync@0.32.0/node_modules/@jitl/quickjs-wasmfile-release-sync/dist/index.mjs
 var variant = { type: "sync", importFFI: () => Promise.resolve().then(() => (init_ffi(), exports_ffi)).then((mod) => mod.QuickJSFFI), importModuleLoader: () => Promise.resolve().then(() => (init_emscripten_module(), exports_emscripten_module)).then((mod) => mod.default) };
 var src_default = variant;
-// ../protocol/src/limits.ts
+// packages/protocol/src/limits.ts
 var FLOORS = {
   codeChars: 48000,
   checkMs: 2000,
@@ -1932,16 +1932,16 @@ var LIMIT_RANGES = {
   canvasWidth: { min: 16, max: FLOORS.canvasSize },
   canvasHeight: { min: 16, max: FLOORS.canvasSize }
 };
-// ../protocol/src/digest.ts
+// packages/protocol/src/digest.ts
 var encoder = new TextEncoder;
 var utf8Bytes = (text) => encoder.encode(text).length;
-// ../protocol/src/reveal.ts
+// packages/protocol/src/reveal.ts
 var BLANK_LOOKING = new Set(["⠀", "\uD81B\uDFE4", "\uD834\uDD59"]);
-// ../protocol/src/text.ts
+// packages/protocol/src/text.ts
 var ALNUM = "0-9A-Za-z\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A";
 var CODE_CHAR = "[0-9A-Z\\uFF10-\\uFF19\\uFF21-\\uFF3A]";
 var AUTH_CODE = new RegExp(`(?<![${ALNUM}])${CODE_CHAR}{4}\\s{0,3}[-\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]\\s{0,3}` + `${CODE_CHAR}{4}(?![${ALNUM}])`, "gu");
-// src/sandbox/leb128.ts
+// packages/check/src/sandbox/leb128.ts
 var MAX_U32 = 4294967295;
 var readUnsignedLeb128 = (bytes, offset) => {
   let value = 0;
@@ -1979,7 +1979,7 @@ var encodeUnsignedLeb128Padded = (value, byteLength) => {
   return out;
 };
 
-// src/sandbox/wasm-memory.ts
+// packages/check/src/sandbox/wasm-memory.ts
 var PAGE_BYTES = 65536;
 var CAPPED_PAGES = FIXED.wasmMemoryBytes / PAGE_BYTES;
 var SECTION_IMPORT = 2;
@@ -2117,7 +2117,7 @@ var patchMemoryMaxPages = (bytes, targetPages) => {
   return { bytes: out, sites };
 };
 
-// src/sandbox/engine.ts
+// packages/check/src/sandbox/engine.ts
 var toArrayBuffer = (bytes) => {
   const copy = new ArrayBuffer(bytes.byteLength);
   new Uint8Array(copy).set(bytes);
@@ -2139,7 +2139,7 @@ var loadEngineFromBytes = async (bytes) => {
   return newQuickJSWASMModuleFromVariant(variant2);
 };
 
-// src/sandbox/job.ts
+// packages/check/src/sandbox/job.ts
 var MAX_JOB_BYTES = FIXED.bundleBytesMax * 2;
 var isRecord2 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var isPositiveInteger = (value) => typeof value === "number" && Number.isInteger(value) && value > 0;
@@ -2176,7 +2176,7 @@ var parseJob = (value) => {
   return { name, code, deps: parsed, checkMs, describeBytes };
 };
 
-// src/sandbox/guest.ts
+// packages/check/src/sandbox/guest.ts
 var GUEST_MEMORY_BYTES = 40 * 1024 * 1024;
 var GUEST_STACK_BYTES = 512 * 1024;
 var PRELUDE = `(function () {
@@ -2225,7 +2225,7 @@ var HELPERS = `(function () {
   };
 })()`;
 
-// src/sandbox/run.ts
+// packages/check/src/sandbox/run.ts
 var errorText = (vm, scope, handle) => {
   const parts = [];
   try {
@@ -2364,7 +2364,7 @@ var runGuest = (job, engine) => {
   }
 };
 
-// src/sandbox/worker.ts
+// packages/check/src/sandbox/worker.ts
 var isRecord3 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var post = (message) => {
   parentPort?.postMessage(message);

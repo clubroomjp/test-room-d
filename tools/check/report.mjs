@@ -1,5 +1,5 @@
-// ../protocol/src/limits.ts
-var NAME_PATTERN = /^[a-z][a-z0-9-]{0,39}$/;
+// packages/protocol/src/limits.ts
+var NAME_PATTERN = /^(?!(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$)[a-z][a-z0-9-]{0,39}$/;
 var SHA256_PATTERN = /^[0-9a-f]{64}$/;
 var FLOORS = {
   codeChars: 48000,
@@ -47,9 +47,9 @@ var LIMIT_RANGES = {
   canvasWidth: { min: 16, max: FLOORS.canvasSize },
   canvasHeight: { min: 16, max: FLOORS.canvasSize }
 };
-// ../protocol/src/digest.ts
+// packages/protocol/src/digest.ts
 var encoder = new TextEncoder;
-// ../protocol/src/marker.ts
+// packages/protocol/src/marker.ts
 var CHECK_CODES = [
   "ok",
   "ok-static",
@@ -69,6 +69,7 @@ var CHECK_CODES = [
 ];
 var isCheckCode = (value) => typeof value === "string" && CHECK_CODES.includes(value);
 var isPassing = (code) => code === "ok" || code === "ok-static";
+var MARKER_PATTERN = /^<!-- jamroom-check v1 code=(?<code>[a-z][a-z0-9-]*) sha256=(?<digest>[0-9a-f]{64}|-) name=(?<name>[a-z][a-z0-9-]{0,39}|-) -->$/;
 var MARKER_HEAD = "<!-- jamroom-check v1 code=";
 var MARKER_TAIL = " -->";
 var SHAPE_SEPARATOR = " ";
@@ -79,14 +80,43 @@ var formatMarker = (marker) => {
   const name = marker.name !== null && NAME_PATTERN.test(marker.name) ? marker.name : NAME_ABSENT;
   return `${MARKER_HEAD}${marker.code}${SHAPE_SEPARATOR}sha256=${digest}${SHAPE_SEPARATOR}name=${name}${MARKER_TAIL}`;
 };
+var parseLine = (line) => {
+  const groups = MARKER_PATTERN.exec(line)?.groups;
+  if (groups === undefined)
+    return null;
+  const code = groups["code"];
+  const digest = groups["digest"];
+  const name = groups["name"];
+  if (code === undefined || digest === undefined || name === undefined)
+    return null;
+  if (!isCheckCode(code))
+    return null;
+  return {
+    code,
+    digest: digest === SHA256_ABSENT ? null : digest,
+    name: name === NAME_ABSENT ? null : name
+  };
+};
+var parseMarker = (commentBody) => {
+  let found = null;
+  for (const rawLine of commentBody.split(/\r\n|\r|\n/)) {
+    const marker = parseLine(rawLine.trim());
+    if (marker === null)
+      continue;
+    if (found !== null)
+      return null;
+    found = marker;
+  }
+  return found;
+};
 var BOT_LOGIN = "github-actions[bot]";
-// ../protocol/src/reveal.ts
+// packages/protocol/src/reveal.ts
 var BLANK_LOOKING = new Set(["⠀", "\uD81B\uDFE4", "\uD834\uDD59"]);
-// ../protocol/src/text.ts
+// packages/protocol/src/text.ts
 var ALNUM = "0-9A-Za-z\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A";
 var CODE_CHAR = "[0-9A-Z\\uFF10-\\uFF19\\uFF21-\\uFF3A]";
 var AUTH_CODE = new RegExp(`(?<![${ALNUM}])${CODE_CHAR}{4}\\s{0,3}[-\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]\\s{0,3}` + `${CODE_CHAR}{4}(?![${ALNUM}])`, "gu");
-// src/report-text.ts
+// packages/check/src/report-text.ts
 var TEXT = {
   ok: {
     ja: "検査に通りました。採否はホストが決めます。",
@@ -166,7 +196,7 @@ var reportText = (code, name, digest) => {
 `;
 };
 
-// src/report.ts
+// packages/check/src/report.ts
 var ISSUE_PATTERN = /^[1-9][0-9]{0,9}$/;
 var REPO_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\/[A-Za-z0-9_.-]{1,100}$/;
 var API_PREFIX = "https://";
@@ -215,9 +245,8 @@ var readComment = (value) => {
   const type = user["type"];
   if (typeof login !== "string" || typeof type !== "string")
     return;
-  if (typeof value["body"] !== "string")
-    return;
-  return { id, login, type };
+  const body = value["body"];
+  return { id, login, type, body: typeof body === "string" ? body : null };
 };
 var report = async (input, fetchImpl) => {
   const rawCode = input.code;
@@ -277,8 +306,11 @@ var report = async (input, fetchImpl) => {
     for (let page = 1;page <= PAGES_MAX; page += 1) {
       const { count, entries } = await readPage(`${issueUrl2}/comments?per_page=${PER_PAGE}&page=${page}`);
       for (const entry of entries) {
-        if (entry.login === BOT_LOGIN && entry.type === "Bot")
-          found = entry.id;
+        if (entry.login !== BOT_LOGIN || entry.type !== "Bot")
+          continue;
+        if (entry.body === null || parseMarker(entry.body) === null)
+          continue;
+        found = entry.id;
       }
       if (count < PER_PAGE)
         break;
@@ -302,7 +334,7 @@ var report = async (input, fetchImpl) => {
   return "done";
 };
 
-// src/report-main.ts
+// packages/check/src/report-main.ts
 var DEFAULT_API_URL = "https://api.github.com";
 var readEnv = (name) => process.env[name] ?? "";
 var main = async () => {

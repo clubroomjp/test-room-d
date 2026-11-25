@@ -1,11 +1,11 @@
-// src/check.ts
+// packages/check/src/check.ts
 import { mkdir, readFile as readFile2, writeFile } from "node:fs/promises";
 import { dirname as dirname2 } from "node:path";
 
-// ../protocol/src/result.ts
+// packages/protocol/src/result.ts
 var ok = (value) => ({ ok: true, value });
 var fail = (code, detail) => detail === undefined ? { ok: false, code } : { ok: false, code, detail };
-// ../protocol/src/record.ts
+// packages/protocol/src/record.ts
 var isRecord = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var hasOnlyKeys = (value, allowed) => {
   for (const key of Object.keys(value)) {
@@ -15,8 +15,8 @@ var hasOnlyKeys = (value, allowed) => {
   return true;
 };
 
-// ../protocol/src/limits.ts
-var NAME_PATTERN = /^[a-z][a-z0-9-]{0,39}$/;
+// packages/protocol/src/limits.ts
+var NAME_PATTERN = /^(?!(?:con|prn|aux|nul|com[0-9]|lpt[0-9])$)[a-z][a-z0-9-]{0,39}$/;
 var SHA256_PATTERN = /^[0-9a-f]{64}$/;
 var FLOORS = {
   codeChars: 48000,
@@ -105,7 +105,7 @@ var resolveLimits = (overrides) => {
     return fail("bad-limits");
   }
 };
-// ../protocol/src/digest.ts
+// packages/protocol/src/digest.ts
 var encoder = new TextEncoder;
 var HEX = "0123456789abcdef";
 var toHex = (bytes) => {
@@ -124,7 +124,7 @@ var sha256Hex = async (data) => {
 };
 var submissionDigest = (name, code) => sha256Hex(`${name}
 ${code}`);
-// ../protocol/src/imports.ts
+// packages/protocol/src/imports.ts
 var WORD_PATTERN = /(?<![A-Za-z0-9_])(?:import|export|from)(?![A-Za-z0-9_])/g;
 var SPACE_PATTERN = /\s/y;
 var NAME_CHAR_PATTERN = /[A-Za-z0-9_$\\\u0080-\uFFFF]/y;
@@ -284,7 +284,7 @@ var findImports = (code) => {
   }
   return ok({ room, lib });
 };
-// ../protocol/src/submission.ts
+// packages/protocol/src/submission.ts
 var TITLE_PREFIX = "contribute: ";
 var START_PATTERN = /^```js[ \t]*$/;
 var END_PATTERN = /^ {0,3}```[ \t]*$/;
@@ -369,7 +369,7 @@ var parseSubmission = (input, options) => {
     return invalid("too-many-deps", name);
   return { kind: "ok", submission: { name, code, roomDeps, libDeps } };
 };
-// ../protocol/src/marker.ts
+// packages/protocol/src/marker.ts
 var CHECK_CODES = [
   "ok",
   "ok-static",
@@ -388,7 +388,7 @@ var CHECK_CODES = [
   "internal"
 ];
 var isCheckCode = (value) => typeof value === "string" && CHECK_CODES.includes(value);
-// ../protocol/src/room-config.ts
+// packages/protocol/src/room-config.ts
 var CONFIG_KEYS = ["format", "title", "entry", "surface", "lib", "license", "limits"];
 var LIB_KEYS = ["name", "path", "sha256", "bytes"];
 var SURFACE_VALUES = ["2d", "webgl2"];
@@ -467,7 +467,7 @@ var parseRoomConfig = (json) => {
     return fail("bad-config", "limits");
   return ok({ format: 1, title, entry, surface, lib, license, limits: resolved.value });
 };
-// ../protocol/src/manifest.ts
+// packages/protocol/src/manifest.ts
 var MANIFEST_KEYS = ["format", "modules"];
 var MODULE_KEYS = ["name", "path", "sha256", "bytes", "issue", "author", "adoptedAt"];
 var AUTHOR_KEYS = ["login", "id"];
@@ -548,7 +548,7 @@ var parseManifest = (json) => {
     return fail("bad-manifest");
   }
 };
-// ../protocol/src/module-graph.ts
+// packages/protocol/src/module-graph.ts
 var heapPush = (heap, node) => {
   let position = heap.length;
   heap.push(node);
@@ -649,7 +649,7 @@ var planLoad = (sources, libNames) => {
   const floating = nodes.filter((node) => !emitted.has(node.index)).map((node) => node.name);
   return { order, floating };
 };
-// ../protocol/src/candidate.ts
+// packages/protocol/src/candidate.ts
 var withCandidate = (sources, candidate) => {
   const merged = new Map;
   let replaces = false;
@@ -722,7 +722,7 @@ var planCandidate = (sources, libNames, candidate) => {
   }
   return { sources: merged, plan, replaces, missing, floats, newlyFloating, closure, usesLib };
 };
-// ../protocol/src/bundle.ts
+// packages/protocol/src/bundle.ts
 var BUNDLE_KEYS = ["format", "config", "manifest", "sources"];
 var manifestNames = (manifest) => new Set(manifest.modules.map((module) => module.name));
 var matchesEntry = async (entry, code) => {
@@ -800,13 +800,13 @@ var parseBundle = async (text) => {
   }
   return ok({ config: config.value, manifest: manifest.value, sources });
 };
-// ../protocol/src/reveal.ts
+// packages/protocol/src/reveal.ts
 var BLANK_LOOKING = new Set(["⠀", "\uD81B\uDFE4", "\uD834\uDD59"]);
-// ../protocol/src/text.ts
+// packages/protocol/src/text.ts
 var ALNUM = "0-9A-Za-z\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A";
 var CODE_CHAR = "[0-9A-Z\\uFF10-\\uFF19\\uFF21-\\uFF3A]";
 var AUTH_CODE = new RegExp(`(?<![${ALNUM}])${CODE_CHAR}{4}\\s{0,3}[-\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]\\s{0,3}` + `${CODE_CHAR}{4}(?![${ALNUM}])`, "gu");
-// src/event.ts
+// packages/check/src/event.ts
 var isRecord2 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var parseEvent = (text) => {
   let json;
@@ -830,7 +830,7 @@ var parseEvent = (text) => {
   return { title, body };
 };
 
-// src/inspect.ts
+// packages/check/src/inspect.ts
 var internal = (name, digest) => ({ code: "internal", name, digest });
 var skipped = () => ({ code: "skip", name: null, digest: null });
 var inspect = async (input) => {
@@ -875,11 +875,11 @@ var inspect = async (input) => {
   }
 };
 
-// src/result.ts
+// packages/check/src/result.ts
 var serializeResult = (result) => `${JSON.stringify({ code: result.code, name: result.name, digest: result.digest })}
 `;
 
-// src/room.ts
+// packages/check/src/room.ts
 import { lstat, readFile } from "node:fs/promises";
 import { join } from "node:path";
 var decoder = new TextDecoder("utf-8", { fatal: true });
@@ -902,13 +902,13 @@ var readRoom = async (root) => {
   }
 };
 
-// src/sandbox/parent.ts
+// packages/check/src/sandbox/parent.ts
 import { spawn } from "node:child_process";
 import { Buffer } from "node:buffer";
 import { dirname, join as join2 } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// src/sandbox/job.ts
+// packages/check/src/sandbox/job.ts
 var SANDBOX_OUTCOMES = ["ok", "load-error", "timeout", "memory", "bad-describe", "internal"];
 var isSandboxOutcome = (value) => typeof value === "string" && SANDBOX_OUTCOMES.includes(value);
 var MAX_JOB_BYTES = FIXED.bundleBytesMax * 2;
@@ -930,7 +930,7 @@ var parseReport = (text) => {
   return isSandboxOutcome(outcome) ? outcome : undefined;
 };
 
-// src/sandbox/parent.ts
+// packages/check/src/sandbox/parent.ts
 var OUTPUT_CAP_BYTES = 64 * 1024;
 var defaultDir = () => dirname(fileURLToPath(import.meta.url));
 var commandFor = (dir, nodePath) => [
@@ -1021,7 +1021,7 @@ var runSandbox = (job, options) => new Promise((resolveOutcome) => {
   }
 });
 
-// src/check.ts
+// packages/check/src/check.ts
 var FALLBACK = { code: "internal", name: null, digest: null };
 var decoder2 = new TextDecoder("utf-8", { fatal: true });
 var readEventText = async (path) => {

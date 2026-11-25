@@ -1,7 +1,7 @@
-// src/sandbox/child.ts
+// packages/check/src/sandbox/child.ts
 import { Buffer } from "node:buffer";
 import { Worker } from "node:worker_threads";
-// ../protocol/src/limits.ts
+// packages/protocol/src/limits.ts
 var FLOORS = {
   codeChars: 48000,
   checkMs: 2000,
@@ -48,16 +48,16 @@ var LIMIT_RANGES = {
   canvasWidth: { min: 16, max: FLOORS.canvasSize },
   canvasHeight: { min: 16, max: FLOORS.canvasSize }
 };
-// ../protocol/src/digest.ts
+// packages/protocol/src/digest.ts
 var encoder = new TextEncoder;
 var utf8Bytes = (text) => encoder.encode(text).length;
-// ../protocol/src/reveal.ts
+// packages/protocol/src/reveal.ts
 var BLANK_LOOKING = new Set(["⠀", "\uD81B\uDFE4", "\uD834\uDD59"]);
-// ../protocol/src/text.ts
+// packages/protocol/src/text.ts
 var ALNUM = "0-9A-Za-z\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A";
 var CODE_CHAR = "[0-9A-Z\\uFF10-\\uFF19\\uFF21-\\uFF3A]";
 var AUTH_CODE = new RegExp(`(?<![${ALNUM}])${CODE_CHAR}{4}\\s{0,3}[-\\u2010-\\u2015\\u2212\\uFE58\\uFE63\\uFF0D]\\s{0,3}` + `${CODE_CHAR}{4}(?![${ALNUM}])`, "gu");
-// src/sandbox/job.ts
+// packages/check/src/sandbox/job.ts
 var SANDBOX_OUTCOMES = ["ok", "load-error", "timeout", "memory", "bad-describe", "internal"];
 var isSandboxOutcome = (value) => typeof value === "string" && SANDBOX_OUTCOMES.includes(value);
 var MAX_JOB_BYTES = FIXED.bundleBytesMax * 2;
@@ -96,7 +96,7 @@ var parseJob = (value) => {
   return { name, code, deps: parsed, checkMs, describeBytes };
 };
 
-// src/sandbox/child.ts
+// packages/check/src/sandbox/child.ts
 var EXIT_GRACE_MS = 500;
 var isRecord3 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 var readStdin = async () => {
